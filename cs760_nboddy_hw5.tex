@@ -301,7 +301,14 @@ K-means, means for GMMs) and map them to the distribution with the closest mean.
 
 Points break down: 7 points each for implementation of each method, 6 points for reporting of
 evaluation metrics.
-
+\\ \\
+\begin{soln}
+	With a $\sigma$ of 0.5, both K-means and GMM achieve about $80\%$ accuracy and taper down 
+	K-means clustering seems to perform a bit better than GMM on these generated datasets, but don't differ too much. GMM definitely seems to be more inconsistent and more prone to fall into local minima. I'm not sure as to the best ways to initialize the latent variables, but that could help with its performance for sure. \\
+	\includegraphics[width=3in]{acc_vs_var.png} \\
+	\includegraphics[width=3in]{obj_vs_var.png} \\
+	\includegraphics[width=3in]{nll_vs_var.png} \\
+\end{soln}
 
 \section{Linear Dimensionality Reduction}
 
@@ -314,6 +321,44 @@ Principal Components Analysis (PCA) is a popular method for linear dimensionalit
 \item  \textbf{(4 Points)}
 Suppose we wish to find the first direction $a_1$ (such that $a_1^\top a_1 = 1$) to maximize $\frac{1}{n} \sum_i (a_1^\top x_i)^2$.
 Show that $a_1$ is the first right singular vector of $X$.
+
+\begin{soln}
+	\[
+	a_1 = \arg \max_{a_1} \frac{1}{n} \sum_{i=1}^n (a_1^T x_i)^2
+	\]
+	\[
+	= \arg \max_{a_1} \frac{1}{n} \sum_{i=1}^n a_1^T x_i x_i^T a_1
+	\]
+	\[
+	= \arg \max_{a_1} a_1^T \left( \frac{1}{n} \sum_{i=1}^N x_i x_i^T \right) a_1
+	\]
+	\[
+	= \arg \max_{a_1} \frac{1}{n} a_1^T X^T X a_1
+	\]
+	Since $\frac{1}{n}$ is constant, we have
+	\[
+	a_1 = \arg \max_{a_1} a_1^T X^T X a_1
+	\]
+	By SVD, $X = U \Sigma V^T$ so $X^T X = (U \Sigma V^T)^T(U \Sigma V^T)$
+	\[
+	= (V \Sigma^T U^T)(U \Sigma V^T)
+	\]
+	\[
+	= V \Sigma^T \Sigma V^T \text{ since } U^T U = I
+	\]
+	\[
+	\Rightarrow a_1 = \arg \max_{a_1} a_1^T V \Sigma^T \Sigma V^T a_1
+	\]
+	\[
+	= \arg \max_{a_1} a_1^T \Sigma^T \Sigma a_1 \text{ since } V \text{ is an orthogonal matrix } V^T V = I \text{ and } \text{change our optimization constraint}
+	\]
+	\(\Sigma^T \Sigma\) is the diagonal matrix of singular values: \(\text{diag}(\sigma_1^2, \sigma_2^2, \ldots)\) 
+	such that \(\sigma_1^2 \geq \sigma_2^2 \geq \ldots \geq \sigma_r^2\).
+	
+	Maximizing \(a_1^T \Sigma^T \Sigma a_1\) is therefore the same as maximizing \(\frac{a_1^T \Sigma^T \Sigma a_1}{a_1^T a_1}\),
+	
+	Since \(a_1^T a_1 = 1\), the optimal \(a_1\) is the one in which \(a_1\) is the unit vector that maximizes the term of \(\sigma_1^2\), the first squared singular value. This \(a_1\) must be the first right singular vector.
+\end{soln}
 
 \item  \textbf{(6 Points)}
 Given $a_1, \dots, a_k$, let $A_k = [a_1, \dots, a_k]$ and 
