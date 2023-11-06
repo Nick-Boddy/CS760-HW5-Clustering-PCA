@@ -323,41 +323,26 @@ Suppose we wish to find the first direction $a_1$ (such that $a_1^\top a_1 = 1$)
 Show that $a_1$ is the first right singular vector of $X$.
 
 \begin{soln}
-	\[
-	a_1 = \arg \max_{a_1} \frac{1}{n} \sum_{i=1}^n (a_1^T x_i)^2
-	\]
-	\[
-	= \arg \max_{a_1} \frac{1}{n} \sum_{i=1}^n a_1^T x_i x_i^T a_1
-	\]
-	\[
-	= \arg \max_{a_1} a_1^T \left( \frac{1}{n} \sum_{i=1}^N x_i x_i^T \right) a_1
-	\]
-	\[
-	= \arg \max_{a_1} \frac{1}{n} a_1^T X^T X a_1
-	\]
+	$$a_1 = \arg \max_{a_1} \frac{1}{n} \sum_{i=1}^n (a_1^T x_i)^2$$
+	$$ = \arg \max_{a_1} \frac{1}{n} \sum_{i=1}^n a_1^T x_i x_i^T a_1$$
+	$$ = \arg \max_{a_1} a_1^T \left( \frac{1}{n} \sum_{i=1}^N x_i x_i^T \right) a_1$$
+	$$ = \arg \max_{a_1} \frac{1}{n} a_1^T X^T X a_1$$
 	Since $\frac{1}{n}$ is constant, we have
-	\[
-	a_1 = \arg \max_{a_1} a_1^T X^T X a_1
-	\]
-	By SVD, $X = U \Sigma V^T$ so $X^T X = (U \Sigma V^T)^T(U \Sigma V^T)$
-	\[
-	= (V \Sigma^T U^T)(U \Sigma V^T)
-	\]
-	\[
-	= V \Sigma^T \Sigma V^T \text{ since } U^T U = I
-	\]
-	\[
-	\Rightarrow a_1 = \arg \max_{a_1} a_1^T V \Sigma^T \Sigma V^T a_1
-	\]
-	\[
-	= \arg \max_{a_1} a_1^T \Sigma^T \Sigma a_1 \text{ since } V \text{ is an orthogonal matrix } V^T V = I \text{ and } \text{change our optimization constraint}
-	\]
-	\(\Sigma^T \Sigma\) is the diagonal matrix of singular values: \(\text{diag}(\sigma_1^2, \sigma_2^2, \ldots)\) 
-	such that \(\sigma_1^2 \geq \sigma_2^2 \geq \ldots \geq \sigma_r^2\).
+	$$a_1 = \arg \max_{a_1} a_1^T X^T X a_1$$
+	By SVD, $X = U \Sigma V^T$ so 
+	$$X^T X = (U \Sigma V^T)^T(U \Sigma V^T)$$
+	$$ = (V \Sigma^T U^T)(U \Sigma V^T)$$
+	$$ = V \Sigma^T \Sigma V^T \text{ since } U^T U = I$$
+	Substituting, we now have
+	$$a_1 = \arg \max_{a_1} a_1^T V \Sigma^T \Sigma V^T a_1$$
+	Because $V$ is an orthogonal matrix and $V^\top V = I$, it doesn't affect our optimization constraint.
+	$$a_1 = \arg \max_{a_1} a_1^T \Sigma^T \Sigma a_1$$
+	$\Sigma^T \Sigma$ is the diagonal matrix of squared singular values: $\text{diag}(\sigma_1^2, \sigma_2^2, \ldots ,\sigma_D^2)$
+	such that $\sigma_1^2 \geq \sigma_2^2 \geq \ldots \geq \sigma_D^2$.
 	
-	Maximizing \(a_1^T \Sigma^T \Sigma a_1\) is therefore the same as maximizing \(\frac{a_1^T \Sigma^T \Sigma a_1}{a_1^T a_1}\),
+	Maximizing $a_1^T \Sigma^T \Sigma a_1$ is therefore the same as maximizing $\sigma_1^2 a_1^T a_1$,
 	
-	Since \(a_1^T a_1 = 1\), the optimal \(a_1\) is the one in which \(a_1\) is the unit vector that maximizes the term of \(\sigma_1^2\), the first squared singular value. This \(a_1\) must be the first right singular vector.
+	Since $a_1^T a_1 = 1$, the optimal $a_1$ is the one in which $a_1$ is the unit vector that maximizes the term of $\sigma_1^2$, the first squared singular value. This $a_1$ must therefore be the first right singular vector.
 \end{soln}
 
 \item  \textbf{(6 Points)}
@@ -366,6 +351,12 @@ $\tilde{x}_i = x_i - A_kA_k^\top x_i$. We wish to find $a_{k+1}$, to maximize
 $\frac{1}{n} \sum_i (a_{k+1}^\top \tilde{x}_i)^2$. Show that $a_{k+1}$ is the
 $(k+1)^{th}$ right singular vector of $X$.
 
+\begin{soln}
+	Since $A_k A_k^\top$ is the projection matrix made by the first $k$ principal components / right singular vectors, $A_k A_k^\top x_i$ is the projection of $x_i$ onto the subspace spanned by $A_k = [a_1, \dots, a_k]$. \\
+	Therefore, $\tilde{x} = x_i - A_k A_k^\top x_i$ is the component of $x_i$ that is orthogonal to that subspace. Similarly, $\tilde{X} = X - A_k A_k^\top X$, the residual matrix, is the part of $X$ orthogonal to the subspace.
+	
+	$$a_{k+1} = \arg \max_{a_{k+1}} 
+\end{soln}
 
 \end{enumerate}
 
