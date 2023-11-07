@@ -355,7 +355,15 @@ $(k+1)^{th}$ right singular vector of $X$.
 	Since $A_k A_k^\top$ is the projection matrix made by the first $k$ principal components / right singular vectors, $A_k A_k^\top x_i$ is the projection of $x_i$ onto the subspace spanned by $A_k = [a_1, \dots, a_k]$. \\
 	Therefore, $\tilde{x} = x_i - A_k A_k^\top x_i$ is the component of $x_i$ that is orthogonal to that subspace. Similarly, $\tilde{X} = X - A_k A_k^\top X$, the residual matrix, is the part of $X$ orthogonal to the subspace.
 	
-	$$a_{k+1} = \arg \max_{a_{k+1}} 
+	$$a_{k+1} = \arg \max_{a_{k+1}} \frac{1}{n} \sum_{i=1}^{n} (a_{k+1}^\top \tilde{x}_i)^2$$
+	$$ = \arg \max_{a_{k+1}} \frac{1}{n} \sum_{i=1}^{n} (a_{k+1}^\top \tilde{x}_i)(\tilde{x}_i^\top a_{k+1})$$
+	$$ = \arg \max_{a_{k+1}} \frac{1}{n} a_{k+1}^\top \left( \sum_{i=1}^{n} \tilde{x}_i \tilde{x}_i^\top\right) a_{k+1}$$
+	$$ = \arg \max_{a_{k+1}} \frac{1}{n} a_{k+1}^\top \tilde{X}^\top \tilde{X} a_{k+1}$$
+	Since $\frac{1}{n}$ is a constant, we have
+	$$a_{k+1} = \arg \max_{a_{k+1}} a_{k+1}^\top \tilde{X}^\top \tilde{X} a_{k+1}$$
+	From a similar process of part 1 above, we use SVD of $\tilde{X}$ to arrive at
+	$$a_{k+1} = \arg \max_{a_{k+1}} \tilde{\sigma}_1^2 a_{k+1}^\top a_{k+1}$$
+	where $\tilde{\sigma}_1^2$ is the first (and largest) squared singular value of the residual matrix. The unit vector $a_{k+1}$ that maximizes this is the corresponding to the first column of $\tilde{V}$, and thus the first right singular vector of $\tilde{X}$. And since $\tilde{X}$ is the residual matrix, the portion of $X$ orthogonal to the subspace spanned by $A_k$, this $a_{k+1}$ is the $(k+1)^{th}$ right singular vector of $X$.
 \end{soln}
 
 \end{enumerate}
@@ -384,7 +392,7 @@ dimensional representation $Z\in \RR^{n\times d}$ so as to minimize
 J(A,b,Z) = \frac{1}{n} \sum_{i=1}^n \|x_i - Az_i - b\|^2 = \| X - ZA^\top - \one b^\top\|_F^2.
 \label{eqn:dimobj}
 \end{equation}
-Here, $\|A\|^2_F = \sum_{i,j} A_{ij}^2$ is the Frobenius norm of a matrix.
+Here, $\|A\|^2_F = \sum_{i,j} A_{ij}^2$ is the Frobenius norm of a matrix.this 
 
 
 \begin{enumerate}
@@ -395,6 +403,20 @@ Denote, $A_2 = A_1M^{-1}$, $b_2 = b_1- A_1M^{-1}p$ and $Z_2 = Z_1 M^\top +
 Show that both
 $(A_1, b_1, Z_1)$ and $(A_2, b_2, Z_2)$ achieve the same objective value $J$~\eqref{eqn:dimobj}.
 \end{enumerate}
+
+\begin{soln}
+	$$
+	\begin{aligned}
+		J(A_2, b_2, Z_2) = \frac{1}{n} \| X - Z_2 A_2^\top - 1 b_2^\top \|_F^2 
+		&= \frac{1}{n} \| X - (Z_1 M^\top + \one p^\top)(A_1 (M^{-1})^\top) - \one (b_1 - A_1 M^{-1} p)^\top \|_F^2 \\
+		&= \frac{1}{n} \| X - (Z_1 M^\top + \one p^\top)((M^{-1})^\top A_1^\top) - \one (b_1^\top - p^\top (M^{-1})^\top A_1^\top) \|_F^2 \\
+		&= \frac{1}{n} \| X - (Z_1 M^\top (M^{-1})^\top A_1^\top + \one p^\top (M^{-1})^\top A_1^\top) - (\one b_1^\top - \one p^\top (M^{-1})^\top A_1^\top) \|_F^2 \\
+		&= \frac{1}{n} \| X - Z_1 A_1^\top - \one p^\top (M^{-1})^\top A_1^\top - \one b_1^\top + \one p^\top (M^{-1})^\top A_1^\top \|_F^2 \\
+		&= \frac{1}{n} \| X - Z_1 A_1^\top - \one b_1^\top \|_F^2 \\
+		&= J(A_1, b_1, Z_1)
+	\end{aligned}
+	$$
+\end{soln}
 
 Therefore, in order to make the problem determined, we need to impose some
 constraint on $Z$. We will assume that the $z_i$'s have zero mean and identity covariance.
@@ -416,11 +438,28 @@ would obtain $A, Z, b$ which minimize the objective and satisfy the constraints.
 \textbf{Hint: }The rank $k$ approximation of a matrix in Frobenius norm is obtained by
 taking its SVD and then zeroing out all but the first $k$ singular values.
 
+\begin{soln}
+	$$A, Z, b = \arg \min_{A, Z, b} \left( \frac{1}{n} \| X - ZA^\top - \one b^\top\|_F^2 \right)$$
+	$$ = \arg \min_{A, Z, b} \left( \frac{1}{n} \sum_{i=1}^n \|x_i - Az_i - b\|^2 \right)$$
+	Let's first consider what value $b$ might take on when minimizing this $J$ function.
+	$$\frac{\partial}{\partial b} \left( \frac{1}{n} \sum_{i=1}^n \|x_i - Az_i - b\|^2 \right) = 0$$
+	$$\frac{\partial}{\partial b} \left( \frac{1}{n} \sum_{i=1}^n (x_i - Az_i - b)^\top (x_i - Az_i - b) \right) = 0$$
+	$$\frac{\partial}{\partial b} \left( \frac{1}{n} \sum_{i=1}^n (x_i - Az_i)^\top (x_i - Az_i) - 2(x_i - Az_i)^\top b + b^\top b \right) = 0$$
+	$$\frac{1}{n} \sum_{i=1}^n \frac{\partial}{\partial b} \left((x_i - Az_i)^\top (x_i - Az_i) - 2(x_i - Az_i)^\top b + b^\top b \right) = 0$$
+	$$\frac{1}{n} \sum_{i=1}^n -2(x_i - Az_i) + 2b = 0$$
+	$$\frac{1}{n} \sum_{i=1}^n b - (x_i - Az_i) = 0$$
+	$$\frac{1}{n} \sum_{i=1}^n b - \frac{1}{n} \sum_{i=1}^n x_i + \frac{1}{n} \sum_{i=1}^n Az_i = 0$$
+	Under the constraints that $z_i$'s have zero mean and identity covariance, this becomes
+	$$n \cdot b = \sum_{i=1}^n x_i$$
+	$$b = \frac{1}{n} \sum_{i=1}^n x_i$$
+	In other words, b ought to be the mean of $x_i$'s.
+\end{soln}
+
 \item \textbf{(3 Points)}
 You are given a point $x_*$ in the original $D$ dimensional space.
 State the rule to obtain the $d$ dimensional
 representation $z_*$ for this new point.
-(If $x_*$ is some original point $x_i$ from the $D$--dimensional space, it shoud be the
+(If $x_*$ is some original point $x_i$ from the $D$--dimensional space, it should be the
 $d$--dimensional representation $z_i$.)
 
 
