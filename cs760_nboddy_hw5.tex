@@ -233,6 +233,17 @@ Consider the K-means (Lloyd's) clustering algorithm we studied in class. We
 terminate the algorithm when there are no changes to the objective.
 Show that the algorithm terminates in a finite number of steps.
 
+\begin{soln}
+	When $X^n$ is a finite set, and we then have a finite number of clusters (since $k < n$), there is a finite set of possible assignments of data points in $X$ to clusters in $\mu^k$. \\
+	By the nature of the K-means algorithm (alternating between assigning each $x_i$ to its nearest centroid in $\mu^k$ and recalculating the mean of each centroid), we know that the algorithm must terminate in a finite number of steps because: \\
+	1. The objective function, if it changes, decreases due to finding a closer centroid for at least one data point. \\
+	2. The objective function is non-increasing, so if it does change, it decreases. \\
+	3. If no change to the objective function occurs after an iteration, the program terminates. \\
+	4. There is a finite number of possible centroid assignments, and therefore a finite number of changes to the objective function. \\
+	
+	Due to these reasons, the K-means clustering algorithm, under the given parameters, will terminate in a finite number of steps.
+\end{soln}
+
 \end{enumerate}
 
 
@@ -453,6 +464,19 @@ taking its SVD and then zeroing out all but the first $k$ singular values.
 	$$n \cdot b = \sum_{i=1}^n x_i$$
 	$$b = \frac{1}{n} \sum_{i=1}^n x_i$$
 	In other words, b ought to be the mean of $x_i$'s.
+	\begin{enumerate}
+		\item First, set $b = \frac{1}{n} \sum_{i=1}^{n} x_i$
+		\item With $b$ as a $D \times 1$ matrix, subtract $\one_n b^\top$ from $X$ to get $\tilde{X}$. \\
+		This $\tilde{X}$ will be mean-centered around zero (and is therefore aligned with what we want $Z$ to be).
+		\item To minimize our function $\frac{1}{n} \|\tilde{X} - Z A^\top \|_F^2$, we want $Z A^\top = \tilde{X}$
+		\item Deconstruct $\tilde{X}$ using SVD. \\ $\tilde{X} = U \Sigma V^\top$
+		\item We now want to correspond $Z$ with $U \Sigma$ and $A$ with $V$.
+		\item We do this by taking the $d$ approximation of $\tilde{X}$. \\
+		Let $U_d$ be $n \times d$, $\Sigma_d$ be $d \times d$, and $V_d$ be $n \times d$.
+		$U_d \Sigma_d V_d^\top$ is the rank $d$ approximation of $\tilde{X}$.
+		\item Approximate $Z = U_d \Sigma_d$ and $A=V_d$. \\
+		To satisfy our constraints that $Z$ has zero mean and identity covariance, we should rescale $Z$. After rescaling, we should then re-estimate $A$ to minimize our $J$ function. We may afterward want to iterate this process of estimating and scaling $Z$, and estimating $A$.
+	\end{enumerate}
 \end{soln}
 
 \item \textbf{(3 Points)}
@@ -461,6 +485,16 @@ State the rule to obtain the $d$ dimensional
 representation $z_*$ for this new point.
 (If $x_*$ is some original point $x_i$ from the $D$--dimensional space, it should be the
 $d$--dimensional representation $z_i$.)
+
+\begin{soln}
+	After our process of approximating our parameters $Z$, $A$, and $b$, when given $x_\star$, which is $D \times 1$, we can do the following to calculate $z_\star$:
+	\begin{enumerate}
+		\item Subtract $b$ from $x_\star$. \\
+		$\tilde{x}_\star = x_\star - b$
+		\item Project $\tilde{x}_\star$ onto the $d$ dimensional space by multiplying by $A$. This will be $z_\star$. \\
+		$z_\star = A^\top \tilde{x}_\star$
+	\end{enumerate}
+\end{soln}
 
 
 \end{enumerate}
