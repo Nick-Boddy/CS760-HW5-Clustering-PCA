@@ -247,7 +247,6 @@ Show that the algorithm terminates in a finite number of steps.
 \end{enumerate}
 
 
-
 \subsection{Experiment (20 Points)}
 
 In this question, we will evaluate
@@ -403,7 +402,7 @@ dimensional representation $Z\in \RR^{n\times d}$ so as to minimize
 J(A,b,Z) = \frac{1}{n} \sum_{i=1}^n \|x_i - Az_i - b\|^2 = \| X - ZA^\top - \one b^\top\|_F^2.
 \label{eqn:dimobj}
 \end{equation}
-Here, $\|A\|^2_F = \sum_{i,j} A_{ij}^2$ is the Frobenius norm of a matrix.this 
+Here, $\|A\|^2_F = \sum_{i,j} A_{ij}^2$ is the Frobenius norm of a matrix.
 
 
 \begin{enumerate}
@@ -472,7 +471,7 @@ taking its SVD and then zeroing out all but the first $k$ singular values.
 		\item Deconstruct $\tilde{X}$ using SVD. \\ $\tilde{X} = U \Sigma V^\top$
 		\item We now want to correspond $Z$ with $U \Sigma$ and $A$ with $V$.
 		\item We do this by taking the $d$ approximation of $\tilde{X}$. \\
-		Let $U_d$ be $n \times d$, $\Sigma_d$ be $d \times d$, and $V_d$ be $n \times d$.
+		Let $U_d$ be $n \times d$, $\Sigma_d$ be $d \times d$, and $V_d$ be $D \times d$.
 		$U_d \Sigma_d V_d^\top$ is the rank $d$ approximation of $\tilde{X}$.
 		\item Approximate $Z = U_d \Sigma_d$ and $A=V_d$. \\
 		To satisfy our constraints that $Z$ has zero mean and identity covariance, we should rescale $Z$. After rescaling, we should then re-estimate $A$ to minimize our $J$ function. We may afterward want to iterate this process of estimating and scaling $Z$, and estimating $A$.
@@ -514,7 +513,6 @@ Here we will compare the above three methods on two data sets.
 \end{enumerate}
 
 
-
 \item 
 One way to study how well the low dimensional representation $Z$ captures the linear
 structure in our data is to project $Z$ back to $D$ dimensions and look at the reconstruction
@@ -552,6 +550,45 @@ where $x_i$'s are the original points and $r(z_i)$ are the $D$ dimensional point
 reconstructed from the 
 $d$ dimensional representation $z_i$.
 
+\begin{soln}
+	When applying my implementations on the 2D dataset, I get the following results. \\
+	\includegraphics[width=3in]{2d_buggy}
+	\includegraphics[width=3in]{2d_demeaned}
+	\includegraphics[width=3in]{2d_normalized}
+	\includegraphics[width=3in]{2d_dro}
+	\begin{center}
+		data2D: 
+		\begin{tabular}{ c  c }
+			Algorithm & Reconstruction Error \\
+			\hline
+			Buggy PCA & 44.345154 \\
+			Demeaned PCA & 0.500304 \\
+			Normalized PCA & 2.473604 \\
+			DRO & 0.500304 \\
+		\end{tabular}
+	\end{center}
+	
+	Both demeaned PCA and DRO have the lowest errors. \\
+	Now, when given the 1000 dimensional dataset, to choose a reasonable $d$, I used a portion of my DRO strategy. I subtracted the mean from the data and performed Singular Value Decomposition. I then looked at the resultant diagonal (singular values) of $\Sigma$, which are of decreasing order. Plotting a bar chart shows an obvious "knee point": \\
+	\includegraphics[width=3in]{sigma_500} \\
+	A closer look: \\
+	\includegraphics[width=3in]{sigma_50} \\
+	What we can infer is that only the first $30$ singular values are of significant importance if we wish to approximate our data. \\
+	Therefore, I choose $d = 30$. Any more dimensions is unnecessary. \\ \\
+	When applying the implementations to the 1000D dataset with $d = 30$, I get the following results: \\
+	\begin{center}
+		data1000D: 
+		\begin{tabular}{ c  c }
+			Algorithm & Reconstruction Error \\
+			\hline
+			Buggy PCA & 401365.699 \\
+			Demeaned PCA & 136522.979 \\
+			Normalized PCA & 136814.290 \\
+			DRO & 136522.979 \\
+		\end{tabular}
+	\end{center}
+\end{soln}
+
 \item \textbf{Questions:} After you have completed the experiments, please answer the following questions.
 \begin{enumerate}
 \item Look at the results for Buggy PCA. The reconstruction error is bad and the
@@ -559,11 +596,24 @@ reconstructed points don't seem to well represent the original points. Why is
 this? \\
 \textbf{Hint: } Which subspace is Buggy PCA trying to project the points
 onto?
+
+\begin{soln}
+	The reason why Buggy PCA performs so poorly is solely due to the reason that it does not demean, or center, the data before finding the principal components. Since PCA attempts to capture the directions of the most variance, if the data has a significantly non-zero mean, the first "axis" of high variance that is captured could potentially the direction of the mean, if influential enough. \\
+	So, in a sense, Buggy PCA is trying to project onto the subspace aligned in the approximate direction of the mean.
+\end{soln}
+
 \item The error criterion we are using is the average squared error 
 between the original points and the reconstructed points.
 In both examples DRO and demeaned PCA achieves the lowest error among all
 methods. 
 Is this surprising? Why?
+
+\begin{soln}
+	I think the error criterion we're using isn't the average squared error, but rather the sum of the squared errors. \\
+	However, it doesn't impact our observation that DRO and demeaned PCA achieved the lowest reconstruction errors for both datasets. This isn't terribly surprising a result because, as mathematically derived previously, these are the best methods to minimize our objective functions. With DRO, we determined that it's optimal to subtract $b = \frac{1}{n} \sum_{i=1}^{n} x_i$ from $X$. This is equivalent to demeaning our data, as is done in both DRO and demeaned PCA. After demeaning, both algorithms then deconstruct using SVD. \\
+	In the case of demeaned PCA, we take the $d$ right singular vectors of $\tilde{X}$ and transform our data with $X_d = \tilde{X} A$. This essentially equates $X_d$ with the $U$ and $\Sigma$ components of SVD, which is what is done in DRO. So because of this correspondence, it makes sense that they both achieve near-identical results.
+\end{soln}
+
 \end{enumerate}
 
 \item Point allocation:
